@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pomodoro</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: url("./background.gif") no-repeat center center fixed;
+      background-size: cover;
+      overflow: hidden;
+    }
+    .pomodoro {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: rgba(255, 255, 255, 0);
+      padding: 10px;
+      border-radius: 10px;
+      width: 280px;
+      border: none;
+    }
+    .time {
+      font-size: 36px;
+      margin: 10px 0;
+      color: #fff;
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .buttons button {
+      margin: 0 5px;
+      padding: 10px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #222B26;
+      color: white;
+      height: 50px;
+    }
+    .buttons button:first-of-type {
+      font-weight: bold;
+      padding: 0 30px;
+      font-size: 20px;
+      height: 50px;
+    }
+    .buttons button:last-of-type {
+      width: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .buttons button img {
+      width: 20px;
+      height: auto;
+      border: none;
+    }
+    .buttons button:hover {
+      background: #222B26;
+    }
+    h1 {
+      color: #fff;
+      font-size: 40px;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      margin-bottom: 0px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="pomodoro">
+    <h1>Pomodoro</h1>
+    <div class="time" id="time">45:00</div>
+    <div class="buttons">
+      <button onclick="startTimer()">Start</button>
+      <button onclick="resetTimer()">
+        <img src="./reset.svg" alt="Reset icon">
+      </button>
+    </div>
+  </div>
+<audio id="alarm-sound" src="./alarm.mp3" preload="auto"></audio>
+  
+  <script>
+    let remainingTime = 2700; // 45 phut
+    let timer;
+    let isRunning = false;
+    const alarmSound = document.getElementById('alarm-sound');
+    const pageId = Math.random().toString(36).substr(2, 9);
+
+    alarmSound.preload = 'auto';
+    function updateTimeDisplay() {
+      const minutes = String(Math.floor(remainingTime / 60)).padStart(2, '0');
+      const seconds = String(remainingTime % 60).padStart(2, '0');
+      document.getElementById('time').textContent = `${minutes}:${seconds}`;
+    }
+
+    function startTimer() {
+      if (isRunning) return;
+      if (remainingTime === 0) resetTimer();
+      isRunning = true;
+      alarmSound.pause();
+      alarmSound.currentTime = 0;
+      const startTime = Date.now();
+      localStorage.setItem('pomodoroStartTime', startTime);
+      localStorage.setItem('pomodoroIsRunning', true);
+      localStorage.setItem('pomodoroReset', false);
+      localStorage.setItem('pomodoroAlarmPage', ''); // Clear any previous alarm page
+      timer = setInterval(tick, 1000);
+    }
+
+    function tick() {
+      if (!isRunning) return;
+      const startTime = parseInt(localStorage.getItem('pomodoroStartTime'), 10);
+      const currentTime = Date.now();
+      remainingTime = 2700 - Math.floor((currentTime - startTime) / 1000);
+      if (remainingTime <= 0) {
+        remainingTime = 0;
+        isRunning = false;
+        clearInterval(timer);
+        updateTimeDisplay(); // Ensure the display shows 00:00
+        const alarmPage = localStorage.getItem('pomodoroAlarmPage');
+        if (!alarmPage) {
+          localStorage.setItem('pomodoroAlarmPage', pageId);
+          playAlarmSound();
+        }
+      } else {
+        updateTimeDisplay();
+      }
+      localStorage.setItem('pomodoroTime', remainingTime);
+    }
+
+    function resetTimer() {
+      isRunning = false;
+      remainingTime = 2700;
+      clearInterval(timer);
+      updateTimeDisplay();
+      alarmSound.pause();
+      alarmSound.currentTime = 0;
+      localStorage.setItem('pomodoroTime', remainingTime);
+      localStorage.setItem('pomodoroIsRunning', false);
+      localStorage.setItem('pomodoroReset', true);
+      localStorage.setItem('pomodoroAlarmPage', ''); // Clear the alarm page on reset
+      localStorage.removeItem('pomodoroStartTime');
+    }
+
+    function syncState() {
+      const storedTime = localStorage.getItem('pomodoroTime');
+      const storedIsRunning = localStorage.getItem('pomodoroIsRunning');
+      const storedReset = localStorage.getItem('pomodoroReset');
+      const alarmPage = localStorage.getItem('pomodoroAlarmPage');
+
+      if (storedTime !== null) {
+        remainingTime = parseInt(storedTime, 10);
+        updateTimeDisplay();
+      }
+
+      if (storedReset === 'true') {
+        isRunning = false;
+        clearInterval(timer);
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+        localStorage.setItem('pomodoroReset', false);
+      } else if (storedIsRunning === 'true' && !isRunning) {
+        isRunning = true;
+        timer = setInterval(tick, 1000);
+      } else if (storedIsRunning === 'false' && isRunning) {
+        isRunning = false;
+        clearInterval(timer);
+      }
+
+      if (alarmPage && alarmPage !== pageId) {
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+      }
+    }
+
+    function playAlarmSound() {
+      alarmSound.currentTime = 0;
+      alarmSound.play().catch(error => console.error('Audio playback error:', error));
+      alarmSound.onended = () => {
+        if (remainingTime === 0) {
+          playAlarmSound();
+        }
+      };
+    }
+
+    window.addEventListener('storage', syncState);
+    window.addEventListener('load', syncState);
+
+    updateTimeDisplay();
+  </script>
+</body>
+</html>
+
