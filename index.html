@@ -91,10 +91,10 @@
       </button>
     </div>
   </div>
-<audio id="alarm-sound" src="./alarm.mp3" preload="auto"></audio>
+  <audio id="alarm-sound" src="./alarm.mp3" preload="auto"></audio>
   
   <script>
-    let remainingTime = 2700; // 45 phut
+    let remainingTime = 2700; // 45 minutes in seconds
     let timer;
     let isRunning = false;
     const alarmSound = document.getElementById('alarm-sound');
@@ -163,7 +163,7 @@
       const alarmPage = localStorage.getItem('pomodoroAlarmPage');
 
       if (storedTime !== null) {
-        remainingTime = parseInt(storedTime, 10);
+        remainingTime = parseInt(storedTime, 10); // Fix here: correct the radix parameter
         updateTimeDisplay();
       }
 
