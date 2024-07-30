@@ -83,7 +83,7 @@
 <body>
   <div class="pomodoro">
     <h1>Pomodoro</h1>
-    <div class="time" id="time">45:00</div>
+    <div class="time" id="time">00:10</div>
     <div class="buttons">
       <button onclick="startTimer()">Start</button>
       <button onclick="resetTimer()">
@@ -94,7 +94,7 @@
   <audio id="alarm-sound" src="./alarm.mp3" preload="auto"></audio>
   
   <script>
-    let remainingTime = 2700; // 45 minutes in seconds
+    let remainingTime = 10; // 45 minutes in seconds
     let timer;
     let isRunning = false;
     const alarmSound = document.getElementById('alarm-sound');
@@ -125,7 +125,7 @@
       if (!isRunning) return;
       const startTime = parseInt(localStorage.getItem('pomodoroStartTime'), 10);
       const currentTime = Date.now();
-      remainingTime = 2700 - Math.floor((currentTime - startTime) / 1000);
+      remainingTime = 10 - Math.floor((currentTime - startTime) / 1000);
       if (remainingTime <= 0) {
         remainingTime = 0;
         isRunning = false;
@@ -144,7 +144,7 @@
 
     function resetTimer() {
       isRunning = false;
-      remainingTime = 2700;
+      remainingTime = 10;
       clearInterval(timer);
       updateTimeDisplay();
       alarmSound.pause();
