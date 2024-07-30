@@ -93,18 +93,34 @@
   </div>
   <audio id="alarm-sound" src="./alarm.mp3" preload="auto"></audio>
   
+  
   <script>
     let remainingTime = 10; // 10 seconds
     let timer;
     let isRunning = false;
     let audioContext;
-    const alarmSound = document.getElementById('alarm-sound');
+    let alarmBuffer;
 
-    function initializeAudioContext() {
+    async function loadSound() {
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        alarmSound.play().then(() => alarmSound.pause()).catch(error => console.error('Audio playback error:', error));
       }
+      if (!alarmBuffer) {
+        const response = await fetch('./alarm.mp3');
+        const arrayBuffer = await response.arrayBuffer();
+        alarmBuffer = await audioContext.decodeAudioData(arrayBuffer);
+      }
+    }
+
+    function playAlarmSound() {
+      if (!audioContext || !alarmBuffer) {
+        loadSound().then(() => playAlarmSound());
+        return;
+      }
+      const source = audioContext.createBufferSource();
+      source.buffer = alarmBuffer;
+      source.connect(audioContext.destination);
+      source.start(0);
     }
 
     function updateTimeDisplay() {
@@ -113,12 +129,10 @@
     }
 
     function startTimer() {
-      initializeAudioContext(); // Ensure AudioContext is initialized
+      loadSound(); // Preload sound
       if (isRunning) return;
       if (remainingTime === 0) resetTimer();
       isRunning = true;
-      alarmSound.pause();
-      alarmSound.currentTime = 0;
       const startTime = Date.now();
       localStorage.setItem('pomodoroStartTime', startTime);
       localStorage.setItem('pomodoroIsRunning', true);
@@ -148,20 +162,12 @@
       remainingTime = 10;
       clearInterval(timer);
       updateTimeDisplay();
-      alarmSound.pause();
-      alarmSound.currentTime = 0;
       localStorage.setItem('pomodoroTime', remainingTime);
       localStorage.setItem('pomodoroIsRunning', false);
       localStorage.setItem('pomodoroReset', true);
       localStorage.removeItem('pomodoroStartTime');
     }
 
-    function playAlarmSound() {
-      alarmSound.currentTime = 0;
-      alarmSound.play().catch(error => console.error('Audio playback error:', error));
-    }
-
-    document.addEventListener('click', initializeAudioContext);
     window.addEventListener('storage', syncState);
     window.addEventListener('load', syncState);
 
@@ -178,8 +184,6 @@
       if (storedReset === 'true') {
         isRunning = false;
         clearInterval(timer);
-        alarmSound.pause();
-        alarmSound.currentTime = 0;
         localStorage.setItem('pomodoroReset', false);
       } else if (storedIsRunning === 'true' && !isRunning) {
         isRunning = true;
@@ -194,5 +198,4 @@
   </script>
 </body>
 </html>
-
 
