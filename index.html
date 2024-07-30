@@ -34,6 +34,7 @@
       font-size: 36px;
       margin: 10px 0;
       color: #fff;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.7); /* Add black shadow for emphasis */
     }
     .buttons {
       display: flex;
@@ -71,6 +72,11 @@
     .buttons button:hover {
       background: #222B26;
     }
+    .highlight {
+      background: #ff6347; /* Highlight color */
+      color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.7); /* Add some shadow for emphasis */
+    }
     h1 {
       color: #fff;
       font-size: 40px;
@@ -84,23 +90,24 @@
 <body>
   <div class="pomodoro">
     <h1>Pomodoro</h1>
-    <div class="time" id="time">00:10</div>
+    <div class="time" id="time">45:00</div>
     <div class="buttons">
-      <button onclick="startTimer()">Start</button>
-      <button onclick="resetTimer()">
+      <button class="highlight" onclick="startTimer()">Start</button>
+      <button class="highlight" onclick="resetTimer()">
         <img src="./reset.svg" alt="Reset icon">
       </button>
     </div>
   </div>
   
   <script>
-    let remainingTime = 10; // 10 seconds
+    let remainingTime = 2700; // 45 minutes in seconds
     let timer;
     let isRunning = false;
 
     function updateTimeDisplay() {
+      const minutes = String(Math.floor(remainingTime / 60)).padStart(2, '0');
       const seconds = String(remainingTime % 60).padStart(2, '0');
-      document.getElementById('time').textContent = `00:${seconds}`;
+      document.getElementById('time').textContent = `${minutes}:${seconds}`;
     }
 
     function startTimer() {
@@ -119,7 +126,7 @@
       if (!isRunning) return;
       const startTime = parseInt(localStorage.getItem('pomodoroStartTime'), 10);
       const currentTime = Date.now();
-      remainingTime = 10 - Math.floor((currentTime - startTime) / 1000);
+      remainingTime = 2700 - Math.floor((currentTime - startTime) / 1000);
       if (remainingTime <= 0) {
         remainingTime = 0;
         isRunning = false;
@@ -134,7 +141,7 @@
 
     function resetTimer() {
       isRunning = false;
-      remainingTime = 10; // Reset to 10 seconds
+      remainingTime = 2700; // Reset to 45 minutes
       clearInterval(timer);
       updateTimeDisplay();
       localStorage.setItem('pomodoroTime', remainingTime);
@@ -173,7 +180,7 @@
       if (Notification.permission === 'granted') {
         new Notification("Pomodoro Timer", {
           body: "Time's up!",
-          icon: 'alarm-icon.png'
+          icon: './alarm.gif'
         });
         localStorage.setItem('pomodoroNotified', true);
       } else if (Notification.permission === 'default') {
@@ -182,6 +189,7 @@
           if (permission === 'granted') {
             new Notification("Pomodoro Timer", {
               body: "Time's up!",
+              icon: './alarm.gif'
             });
             localStorage.setItem('pomodoroNotified', true);
           }
