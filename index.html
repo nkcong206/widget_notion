@@ -27,6 +27,7 @@
       padding: 10px;
       border-radius: 10px;
       width: 280px;
+      height: 100%;
       border: none;
     }
     .time {
@@ -91,37 +92,11 @@
       </button>
     </div>
   </div>
-  <audio id="alarm-sound" src="./alarm.mp3" preload="auto"></audio>
-  
   
   <script>
     let remainingTime = 10; // 10 seconds
     let timer;
     let isRunning = false;
-    let audioContext;
-    let alarmBuffer;
-
-    async function loadSound() {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (!alarmBuffer) {
-        const response = await fetch('./alarm.mp3');
-        const arrayBuffer = await response.arrayBuffer();
-        alarmBuffer = await audioContext.decodeAudioData(arrayBuffer);
-      }
-    }
-
-    function playAlarmSound() {
-      if (!audioContext || !alarmBuffer) {
-        loadSound().then(() => playAlarmSound());
-        return;
-      }
-      const source = audioContext.createBufferSource();
-      source.buffer = alarmBuffer;
-      source.connect(audioContext.destination);
-      source.start(0);
-    }
 
     function updateTimeDisplay() {
       const seconds = String(remainingTime % 60).padStart(2, '0');
@@ -129,7 +104,6 @@
     }
 
     function startTimer() {
-      loadSound(); // Preload sound
       if (isRunning) return;
       if (remainingTime === 0) resetTimer();
       isRunning = true;
@@ -150,7 +124,7 @@
         isRunning = false;
         clearInterval(timer);
         updateTimeDisplay(); // Ensure the display shows 00:00
-        playAlarmSound();
+        displayNotification();
       } else {
         updateTimeDisplay();
       }
@@ -159,17 +133,13 @@
 
     function resetTimer() {
       isRunning = false;
-      remainingTime = 10;
+      remainingTime = 10; // Reset to 10 seconds
       clearInterval(timer);
       updateTimeDisplay();
       localStorage.setItem('pomodoroTime', remainingTime);
       localStorage.setItem('pomodoroIsRunning', false);
       localStorage.setItem('pomodoroReset', true);
-      localStorage.removeItem('pomodoroStartTime');
     }
-
-    window.addEventListener('storage', syncState);
-    window.addEventListener('load', syncState);
 
     function syncState() {
       const storedTime = localStorage.getItem('pomodoroTime');
@@ -177,7 +147,7 @@
       const storedReset = localStorage.getItem('pomodoroReset');
 
       if (storedTime !== null) {
-        remainingTime = parseInt(storedTime, 10);
+        remainingTime = parseInt(storedTime, 10); // Fix here: correct the radix parameter
         updateTimeDisplay();
       }
 
@@ -193,6 +163,38 @@
         clearInterval(timer);
       }
     }
+
+    function displayNotification() {
+      if (Notification.permission === 'granted') {
+        new Notification("Pomodoro Timer", {
+          body: "Time's up!",
+          icon: 'alarm-icon.png'
+        });
+      } else if (Notification.permission === 'default') {
+        // Request permission if it has not been granted or denied
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            new Notification("Pomodoro Timer", {
+              body: "Time's up!",
+            });
+          }
+        });
+      }
+    }
+
+    window.addEventListener('storage', syncState);
+    window.addEventListener('load', syncState);
+
+    // Request notification permission when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      if (Notification.permission === 'default') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            console.log('Notification permission granted.');
+          }
+        });
+      }
+    });
 
     updateTimeDisplay();
   </script>
