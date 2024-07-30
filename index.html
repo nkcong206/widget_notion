@@ -112,7 +112,7 @@
     </div>
   </div>
   <audio id="alarm-sound" src="./alarm.mp3" preload="auto" loop></audio>
-  <script>
+   <script>
     let remainingTime = 10;
     let timer;
     let isRunning = false;
@@ -234,9 +234,6 @@
       document.addEventListener('click', playAudio);
     }
 
-    window.addEventListener('storage', syncState);
-    window.addEventListener('load', syncState);
-
     document.addEventListener('DOMContentLoaded', () => {
       if (Notification.permission === 'default') {
         Notification.requestPermission().then(permission => {
@@ -245,10 +242,19 @@
           }
         });
       }
+
+      // Listen for any click on the page to potentially trigger audio
+      document.addEventListener('click', () => {
+        alarmSound.play().catch(error => {
+          console.error('Audio playback error:', error);
+          requestAudioPermission();
+        });
+      });
     });
 
+    window.addEventListener('storage', syncState);
+    window.addEventListener('load', syncState);
     updateTimeDisplay();
   </script>
 </body>
 </html>
-
