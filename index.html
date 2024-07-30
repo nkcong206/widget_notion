@@ -111,6 +111,7 @@
       localStorage.setItem('pomodoroStartTime', startTime);
       localStorage.setItem('pomodoroIsRunning', true);
       localStorage.setItem('pomodoroReset', false);
+      localStorage.setItem('pomodoroNotified', false); // Reset notification status
       timer = setInterval(tick, 1000);
     }
 
@@ -139,6 +140,7 @@
       localStorage.setItem('pomodoroTime', remainingTime);
       localStorage.setItem('pomodoroIsRunning', false);
       localStorage.setItem('pomodoroReset', true);
+      localStorage.setItem('pomodoroNotified', false); // Reset notification status
     }
 
     function syncState() {
@@ -165,11 +167,15 @@
     }
 
     function displayNotification() {
+      const notified = localStorage.getItem('pomodoroNotified') === 'true';
+      if (notified) return;
+
       if (Notification.permission === 'granted') {
         new Notification("Pomodoro Timer", {
           body: "Time's up!",
           icon: 'alarm-icon.png'
         });
+        localStorage.setItem('pomodoroNotified', true);
       } else if (Notification.permission === 'default') {
         // Request permission if it has not been granted or denied
         Notification.requestPermission().then(permission => {
@@ -177,6 +183,7 @@
             new Notification("Pomodoro Timer", {
               body: "Time's up!",
             });
+            localStorage.setItem('pomodoroNotified', true);
           }
         });
       }
