@@ -4,10 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pomodoro</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Lilita+One&family=Pacifico&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Nunito', sans-serif;
+      font-family: "Pacifico", cursive;
+      font-weight: 400;
+      font-style: normal;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -17,82 +22,85 @@
       background-size: cover;
       overflow: hidden;
     }
+
     .pomodoro {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
-      background: rgba(255, 255, 255, 0);
-      padding: 10px;
+      background: rgba(0, 0, 0, 0.0); /* Nền trong suốt */
+      padding: 0px;
       border-radius: 10px;
-      width: 280px;
-      height: 100%;
+      width: 250px;
       border: none;
     }
+
     .time {
-      font-size: 36px;
-      margin: 10px 0;
-      color: #fff;
-      text-shadow: 0 0 10px rgba(0, 0, 0, 0.7); /* Add black shadow for emphasis */
+      font-size: 150px; /* Kích thước chữ lớn */
+      margin: 0 0 5px 0;
+      color: white; /* Màu sắc nổi bật */
+      text-shadow: 0 0 15px rgba(0, 0, 0, 0.8); /* Bóng chữ nổi bật */
     }
+
     .buttons {
       display: flex;
-      justify-content: center;
-      align-items: center;
+      justify-content: center; /* Căn giữa các nút theo chiều ngang */
+      align-items: center; /* Căn giữa các nút theo chiều dọc */
+      gap: 10px; /* Khoảng cách giữa các nút */
+      margin-top: -40px; /* Khoảng cách từ thời gian đến các nút */
     }
+
     .buttons button {
-      margin: 0 5px;
-      padding: 10px 30px;
+      margin: 5px; /* Khoảng cách giữa các nút */
+      padding: 10px 20px;
       font-size: 16px;
       border: none;
-      border-radius: 5px;
+      border-radius: 10px;
       cursor: pointer;
       background: #222B26;
       color: white;
-      height: 50px;
+      height: 40px;
     }
+
     .buttons button:first-of-type {
       font-weight: bold;
-      padding: 0 30px;
+      padding: 10px; /* Điều chỉnh padding cho nút START */
       font-size: 20px;
-      height: 50px;
+      width: 150px; /* Chiều rộng cho nút START */
     }
+
     .buttons button:last-of-type {
-      width: 50px;
+      width: 40px; /* Chiều rộng cho nút RESET */
       display: flex;
       justify-content: center;
       align-items: center;
     }
+
     .buttons button img {
       width: 20px;
       height: auto;
       border: none;
     }
+
     .buttons button:hover {
-      background: #222B26;
+      transform: scale(1.1); /* Tăng kích thước một chút khi hover */
     }
-    .highlight {
-      background: #ff6347; /* Highlight color */
+
+    .buttons button.highlight {
+      font-family: 'Lilita One', sans-serif;
+      font-weight: normal;
+      background: #222B26; /* Màu nền cho nút */
       color: white;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.7); /* Add some shadow for emphasis */
-    }
-    h1 {
-      color: #fff;
-      font-size: 40px;
-      font-weight: 700;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-      margin-bottom: 0px;
-      white-space: nowrap;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.8); /* Bóng chữ nổi bật */
     }
   </style>
 </head>
 <body>
   <div class="pomodoro">
-    <h1>Pomodoro</h1>
     <div class="time" id="time">45:00</div>
     <div class="buttons">
-      <button class="highlight" onclick="startTimer()">Start</button>
+      <button class="highlight" onclick="startTimer()">START</button>
       <button class="highlight" onclick="resetTimer()">
         <img src="./reset.svg" alt="Reset icon">
       </button>
@@ -100,7 +108,7 @@
   </div>
   
   <script>
-    let remainingTime = 2700; // 45 minutes in seconds
+    let remainingTime = 2700; 
     let timer;
     let isRunning = false;
 
@@ -118,7 +126,7 @@
       localStorage.setItem('pomodoroStartTime', startTime);
       localStorage.setItem('pomodoroIsRunning', true);
       localStorage.setItem('pomodoroReset', false);
-      localStorage.setItem('pomodoroNotified', false); // Reset notification status
+      localStorage.setItem('pomodoroNotified', false);
       timer = setInterval(tick, 1000);
     }
 
@@ -131,7 +139,7 @@
         remainingTime = 0;
         isRunning = false;
         clearInterval(timer);
-        updateTimeDisplay(); // Ensure the display shows 00:00
+        updateTimeDisplay();
         displayNotification();
       } else {
         updateTimeDisplay();
@@ -141,13 +149,13 @@
 
     function resetTimer() {
       isRunning = false;
-      remainingTime = 2700; // Reset to 45 minutes
+      remainingTime = 2700; 
       clearInterval(timer);
       updateTimeDisplay();
       localStorage.setItem('pomodoroTime', remainingTime);
       localStorage.setItem('pomodoroIsRunning', false);
       localStorage.setItem('pomodoroReset', true);
-      localStorage.setItem('pomodoroNotified', false); // Reset notification status
+      localStorage.setItem('pomodoroNotified', false);
     }
 
     function syncState() {
@@ -156,7 +164,7 @@
       const storedReset = localStorage.getItem('pomodoroReset');
 
       if (storedTime !== null) {
-        remainingTime = parseInt(storedTime, 10); // Fix here: correct the radix parameter
+        remainingTime = parseInt(storedTime, 10);
         updateTimeDisplay();
       }
 
@@ -184,7 +192,6 @@
         });
         localStorage.setItem('pomodoroNotified', true);
       } else if (Notification.permission === 'default') {
-        // Request permission if it has not been granted or denied
         Notification.requestPermission().then(permission => {
           if (permission === 'granted') {
             new Notification("Pomodoro Timer", {
@@ -200,7 +207,6 @@
     window.addEventListener('storage', syncState);
     window.addEventListener('load', syncState);
 
-    // Request notification permission when the page loads
     document.addEventListener('DOMContentLoaded', () => {
       if (Notification.permission === 'default') {
         Notification.requestPermission().then(permission => {
