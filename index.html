@@ -26,10 +26,10 @@
     .pomodoro {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: center; /* Đưa các phần tử về phía trên */
       align-items: center;
       text-align: center;
-      background: rgba(0, 0, 0, 0);
+      background: rgba(0, 0, 0, 0); /* Nền trong suốt */
       padding: 0px;
       border-radius: 10px;
       width: 100px;
@@ -38,72 +38,72 @@
     }
 
     .time {
-      font-size: 60px;
+      font-size: 70px; /* Kích thước chữ lớn */
       margin: 0 0 0 0;
-      color: white;
-      text-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+      color: white; /* Màu sắc nổi bật */
+      text-shadow: 0 0 15px rgba(0, 0, 0, 0.8); /* Bóng chữ nổi bật */
     }
 
     .buttons {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-top: -15px;
+      justify-content: center; /* Căn giữa các nút theo chiều ngang */
+      align-items: center; /* Căn giữa các nút theo chiều dọc */
+      gap: 10px; /* Khoảng cách giữa các nút */
+      margin-top: -10px; /* Khoảng cách từ thời gian đến các nút */
     }
 
     .buttons button {
-      margin: 0px;
-      padding: 10px 20px;
+      margin: 0px; /* Khoảng cách giữa các nút */
+      padding: 0px 0px;
       font-size: 16px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
       background: #222B26;
       color: white;
-      height: 25px;
+      height: 30px;
     }
 
     .buttons button:first-of-type {
       font-weight: bold;
-      padding: 0px;
-      font-size: 12px;
-      width: 60px;
+      padding: 0px; /* Điều chỉnh padding cho nút START */
+      font-size: 16px;
+      width: 60px; /* Chiều rộng cho nút START */
     }
 
     .buttons button:last-of-type {
-      width: 25px;
-      height: 25px;
+      width: 30px; /* Chiều rộng cho nút RESET */
+      height: 30px; /* Chiều cao cho nút RESET */
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 0;
-      border-radius: 5px;
+      padding: 0; /* Xóa padding */
+      border-radius: 5px; /* Đảm bảo nút là hình vuông */
     }
 
     .buttons button img {
-      width: 15px;
-      height: 15px;
-      object-fit: contain;
+      width: 16px; /* Điều chỉnh kích thước của ảnh */
+      height: 16px; /* Điều chỉnh kích thước của ảnh */
+      object-fit: contain; /* Đảm bảo ảnh không vượt quá kích thước của nút */
       border: none;
     }
 
     .buttons button:hover {
-      transform: scale(1.1);
+      transform: scale(1.1); /* Tăng kích thước một chút khi hover */
     }
 
     .buttons button.highlight {
       font-family: 'Lilita One', sans-serif;
       font-weight: normal;
-      background: #222B26;
+      background: #222B26; /* Màu nền cho nút */
       color: white;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.8); /* Bóng chữ nổi bật */
     }
   </style>
 </head>
 <body>
   <div class="pomodoro">
-    <div class="time" id="time">00:10</div>
+    <div class="time" id="time">45:00</div>
     <div class="buttons">
       <button class="highlight" onclick="startTimer()">START</button>
       <button class="highlight" onclick="resetTimer()">
@@ -111,13 +111,11 @@
       </button>
     </div>
   </div>
-  <audio id="alarm-sound" src="./alarm.mp3" preload="auto" loop></audio>
-   <script>
-    let remainingTime = 10;
+  
+  <script>
+    let remainingTime = 2700; 
     let timer;
     let isRunning = false;
-    const alarmSound = document.getElementById('alarm-sound');
-    alarmSound.preload = 'auto';
 
     function updateTimeDisplay() {
       const minutes = String(Math.floor(remainingTime / 60)).padStart(2, '0');
@@ -129,8 +127,6 @@
       if (isRunning) return;
       if (remainingTime === 0) resetTimer();
       isRunning = true;
-      alarmSound.pause();
-      alarmSound.currentTime = 0;
       const startTime = Date.now();
       localStorage.setItem('pomodoroStartTime', startTime);
       localStorage.setItem('pomodoroIsRunning', true);
@@ -143,14 +139,13 @@
       if (!isRunning) return;
       const startTime = parseInt(localStorage.getItem('pomodoroStartTime'), 10);
       const currentTime = Date.now();
-      remainingTime = 10 - Math.floor((currentTime - startTime) / 1000);
+      remainingTime = 2700 - Math.floor((currentTime - startTime) / 1000);
       if (remainingTime <= 0) {
         remainingTime = 0;
         isRunning = false;
         clearInterval(timer);
         updateTimeDisplay();
         displayNotification();
-        playAlarmSound();
       } else {
         updateTimeDisplay();
       }
@@ -159,11 +154,9 @@
 
     function resetTimer() {
       isRunning = false;
-      remainingTime = 10;
+      remainingTime = 2700; 
       clearInterval(timer);
       updateTimeDisplay();
-      alarmSound.pause();
-      alarmSound.currentTime = 0;
       localStorage.setItem('pomodoroTime', remainingTime);
       localStorage.setItem('pomodoroIsRunning', false);
       localStorage.setItem('pomodoroReset', true);
@@ -183,8 +176,6 @@
       if (storedReset === 'true') {
         isRunning = false;
         clearInterval(timer);
-        alarmSound.pause();
-        alarmSound.currentTime = 0;
         localStorage.setItem('pomodoroReset', false);
       } else if (storedIsRunning === 'true' && !isRunning) {
         isRunning = true;
@@ -193,14 +184,6 @@
         isRunning = false;
         clearInterval(timer);
       }
-    }
-
-    function playAlarmSound() {
-      alarmSound.currentTime = 0;
-      alarmSound.play().catch(error => {
-        console.error('Audio playback error:', error);
-        requestAudioPermission();
-      });
     }
 
     function displayNotification() {
@@ -226,13 +209,8 @@
       }
     }
 
-    function requestAudioPermission() {
-      const playAudio = () => {
-        alarmSound.play().catch(error => console.error('Audio playback error:', error));
-        document.removeEventListener('click', playAudio);
-      };
-      document.addEventListener('click', playAudio);
-    }
+    window.addEventListener('storage', syncState);
+    window.addEventListener('load', syncState);
 
     document.addEventListener('DOMContentLoaded', () => {
       if (Notification.permission === 'default') {
@@ -242,19 +220,10 @@
           }
         });
       }
-
-      // Listen for any click on the page to potentially trigger audio
-      document.addEventListener('click', () => {
-        alarmSound.play().catch(error => {
-          console.error('Audio playback error:', error);
-          requestAudioPermission();
-        });
-      });
     });
 
-    window.addEventListener('storage', syncState);
-    window.addEventListener('load', syncState);
     updateTimeDisplay();
   </script>
 </body>
 </html>
+
