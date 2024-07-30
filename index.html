@@ -98,34 +98,37 @@
     let timer;
     let isRunning = false;
     let audioContext;
-    let alarmBuffer;
+    const alarmSound = document.getElementById('alarm-sound');
+
+    function initializeAudioContext() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        alarmSound.play().then(() => alarmSound.pause()).catch(error => console.error('Audio playback error:', error));
+      }
+    }
 
     function updateTimeDisplay() {
       const seconds = String(remainingTime % 60).padStart(2, '0');
       document.getElementById('time').textContent = `00:${seconds}`;
     }
 
-    async function loadAlarmSound() {
-      try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const response = await fetch('./alarm.mp3');
-        const arrayBuffer = await response.arrayBuffer();
-        alarmBuffer = await audioContext.decodeAudioData(arrayBuffer);
-      } catch (error) {
-        console.error('Error loading alarm sound:', error);
-      }
-    }
-
     function startTimer() {
+      initializeAudioContext(); // Ensure AudioContext is initialized
       if (isRunning) return;
       if (remainingTime === 0) resetTimer();
       isRunning = true;
+      alarmSound.pause();
+      alarmSound.currentTime = 0;
       const startTime = Date.now();
-      timer = setInterval(() => tick(startTime), 1000);
+      localStorage.setItem('pomodoroStartTime', startTime);
+      localStorage.setItem('pomodoroIsRunning', true);
+      localStorage.setItem('pomodoroReset', false);
+      timer = setInterval(tick, 1000);
     }
 
-    function tick(startTime) {
+    function tick() {
       if (!isRunning) return;
+      const startTime = parseInt(localStorage.getItem('pomodoroStartTime'), 10);
       const currentTime = Date.now();
       remainingTime = 10 - Math.floor((currentTime - startTime) / 1000);
       if (remainingTime <= 0) {
@@ -137,6 +140,7 @@
       } else {
         updateTimeDisplay();
       }
+      localStorage.setItem('pomodoroTime', remainingTime);
     }
 
     function resetTimer() {
@@ -144,21 +148,51 @@
       remainingTime = 10;
       clearInterval(timer);
       updateTimeDisplay();
+      alarmSound.pause();
+      alarmSound.currentTime = 0;
+      localStorage.setItem('pomodoroTime', remainingTime);
+      localStorage.setItem('pomodoroIsRunning', false);
+      localStorage.setItem('pomodoroReset', true);
+      localStorage.removeItem('pomodoroStartTime');
     }
 
     function playAlarmSound() {
-      if (!audioContext || !alarmBuffer) return;
-      const source = audioContext.createBufferSource();
-      source.buffer = alarmBuffer;
-      source.connect(audioContext.destination);
-      source.start(0);
+      alarmSound.currentTime = 0;
+      alarmSound.play().catch(error => console.error('Audio playback error:', error));
     }
 
-    window.addEventListener('load', () => {
-      updateTimeDisplay();
-      loadAlarmSound();
-    });
+    document.addEventListener('click', initializeAudioContext);
+    window.addEventListener('storage', syncState);
+    window.addEventListener('load', syncState);
+
+    function syncState() {
+      const storedTime = localStorage.getItem('pomodoroTime');
+      const storedIsRunning = localStorage.getItem('pomodoroIsRunning');
+      const storedReset = localStorage.getItem('pomodoroReset');
+
+      if (storedTime !== null) {
+        remainingTime = parseInt(storedTime, 10);
+        updateTimeDisplay();
+      }
+
+      if (storedReset === 'true') {
+        isRunning = false;
+        clearInterval(timer);
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+        localStorage.setItem('pomodoroReset', false);
+      } else if (storedIsRunning === 'true' && !isRunning) {
+        isRunning = true;
+        timer = setInterval(tick, 1000);
+      } else if (storedIsRunning === 'false' && isRunning) {
+        isRunning = false;
+        clearInterval(timer);
+      }
+    }
+
+    updateTimeDisplay();
   </script>
 </body>
 </html>
+
 
