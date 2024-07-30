@@ -99,8 +99,6 @@
     let isRunning = false;
     const alarmSound = document.getElementById('alarm-sound');
 
-    alarmSound.preload = 'auto';
-
     function updateTimeDisplay() {
       const seconds = String(remainingTime % 60).padStart(2, '0');
       document.getElementById('time').textContent = `00:${seconds}`;
@@ -108,7 +106,6 @@
 
     function startTimer() {
       if (isRunning) return;
-      if (remainingTime === 0) resetTimer();
       isRunning = true;
       alarmSound.pause();
       alarmSound.currentTime = 0;
@@ -149,39 +146,28 @@
       localStorage.removeItem('pomodoroStartTime');
     }
 
-    function syncState() {
-      const storedTime = localStorage.getItem('pomodoroTime');
-      const storedIsRunning = localStorage.getItem('pomodoroIsRunning');
-      const storedReset = localStorage.getItem('pomodoroReset');
-
-      if (storedTime !== null) {
-        remainingTime = parseInt(storedTime, 10);
-        updateTimeDisplay();
-      }
-
-      if (storedReset === 'true') {
-        isRunning = false;
-        clearInterval(timer);
-        alarmSound.pause();
-        alarmSound.currentTime = 0;
-        localStorage.setItem('pomodoroReset', false);
-      } else if (storedIsRunning === 'true' && !isRunning) {
-        isRunning = true;
-        timer = setInterval(tick, 1000);
-      } else if (storedIsRunning === 'false' && isRunning) {
-        isRunning = false;
-        clearInterval(timer);
-      }
-    }
-
     function playAlarmSound() {
       alarmSound.currentTime = 0;
       alarmSound.play().catch(error => console.error('Audio playback error:', error));
-      alarmSound.onended = () => {
-        // Play alarm sound continuously
-        alarmSound.currentTime = 0;
-        alarmSound.play().catch(error => console.error('Audio playback error:', error));
-      };
+    }
+
+    function syncState() {
+      const savedTime = localStorage.getItem('pomodoroTime');
+      const savedIsRunning = JSON.parse(localStorage.getItem('pomodoroIsRunning'));
+      const savedReset = JSON.parse(localStorage.getItem('pomodoroReset'));
+      
+      if (savedTime !== null) {
+        remainingTime = parseInt(savedTime, 10);
+        updateTimeDisplay();
+      }
+      
+      if (savedIsRunning) {
+        isRunning = true;
+        const startTime = parseInt(localStorage.getItem('pomodoroStartTime'), 10);
+        timer = setInterval(tick, 1000);
+      } else if (savedReset) {
+        resetTimer();
+      }
     }
 
     window.addEventListener('storage', syncState);
