@@ -98,18 +98,8 @@
     let timer;
     let isRunning = false;
     const alarmSound = document.getElementById('alarm-sound');
-    let isPageVisible = true; // Track page visibility
 
     alarmSound.preload = 'auto';
-
-    // Handle visibility change
-    document.addEventListener('visibilitychange', function() {
-      isPageVisible = !document.hidden;
-      if (!isPageVisible) {
-        alarmSound.pause(); // Pause the sound if page is not visible
-        alarmSound.currentTime = 0;
-      }
-    });
 
     function updateTimeDisplay() {
       const seconds = String(remainingTime % 60).padStart(2, '0');
@@ -139,9 +129,7 @@
         isRunning = false;
         clearInterval(timer);
         updateTimeDisplay(); // Ensure the display shows 00:00
-        if (isPageVisible) {
-          playAlarmSound();
-        }
+        playAlarmSound();
       } else {
         updateTimeDisplay();
       }
@@ -190,9 +178,9 @@
       alarmSound.currentTime = 0;
       alarmSound.play().catch(error => console.error('Audio playback error:', error));
       alarmSound.onended = () => {
-        if (remainingTime === 0 && isPageVisible) {
-          playAlarmSound();
-        }
+        // Play alarm sound continuously
+        alarmSound.currentTime = 0;
+        alarmSound.play().catch(error => console.error('Audio playback error:', error));
       };
     }
 
