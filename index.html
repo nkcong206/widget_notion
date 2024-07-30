@@ -26,10 +26,10 @@
     .pomodoro {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: column; /* Đưa các phần tử về phía trên */
       align-items: center;
       text-align: center;
-      background: rgba(0, 0, 0, 0.0); /* Nền trong suốt */
+      background: rgba(0, 0, 0, 0); /* Nền trong suốt */
       padding: 0px;
       border-radius: 10px;
       width: 250px;
@@ -37,8 +37,8 @@
     }
 
     .time {
-      font-size: 150px; /* Kích thước chữ lớn */
-      margin: 0 0 5px 0;
+      font-size: 80px; /* Kích thước chữ lớn */
+      margin: 0 0 0 0;
       color: white; /* Màu sắc nổi bật */
       text-shadow: 0 0 15px rgba(0, 0, 0, 0.8); /* Bóng chữ nổi bật */
     }
@@ -48,7 +48,7 @@
       justify-content: center; /* Căn giữa các nút theo chiều ngang */
       align-items: center; /* Căn giữa các nút theo chiều dọc */
       gap: 10px; /* Khoảng cách giữa các nút */
-      margin-top: -40px; /* Khoảng cách từ thời gian đến các nút */
+      margin-top: -20px; /* Khoảng cách từ thời gian đến các nút */
     }
 
     .buttons button {
@@ -65,20 +65,20 @@
 
     .buttons button:first-of-type {
       font-weight: bold;
-      padding: 10px; /* Điều chỉnh padding cho nút START */
-      font-size: 20px;
-      width: 150px; /* Chiều rộng cho nút START */
+      padding: 0px; /* Điều chỉnh padding cho nút START */
+      font-size: 15px;
+      width: 70px; /* Chiều rộng cho nút START */
     }
 
     .buttons button:last-of-type {
-      width: 40px; /* Chiều rộng cho nút RESET */
+      width: 30px; /* Chiều rộng cho nút RESET */
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
     .buttons button img {
-      width: 20px;
+      width: 15px;
       height: auto;
       border: none;
     }
