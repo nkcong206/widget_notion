@@ -84,7 +84,7 @@
 <body>
   <div class="pomodoro">
     <h1>Pomodoro</h1>
-    <div class="time" id="time">45:00</div>
+    <div class="time" id="time">00:10</div>
     <div class="buttons">
       <button onclick="startTimer()">Start</button>
       <button onclick="resetTimer()">
@@ -94,14 +94,14 @@
   </div>
   
   <script>
-    let remainingTime = 45 * 60; // 45 minutes in seconds
+    let remainingTime = 10; // 10 seconds in seconds
     let timer;
     let isRunning = false;
 
     function updateTimeDisplay() {
       const minutes = String(Math.floor(remainingTime / 60)).padStart(2, '0');
       const seconds = String(remainingTime % 60).padStart(2, '0');
-      document.getElementById('time').textContent = `${minutes}:${seconds}`;
+      document.getElementById('time').textContent = ${minutes}:${seconds};
     }
 
     function startTimer() {
@@ -119,7 +119,7 @@
       if (!isRunning) return;
       const startTime = parseInt(localStorage.getItem('pomodoroStartTime'), 10);
       const currentTime = Date.now();
-      remainingTime = 45 * 60 - Math.floor((currentTime - startTime) / 1000);
+      remainingTime = 10 - Math.floor((currentTime - startTime) / 1000);
       if (remainingTime <= 0) {
         remainingTime = 0;
         isRunning = false;
@@ -134,7 +134,7 @@
 
     function resetTimer() {
       isRunning = false;
-      remainingTime = 45 * 60; // Reset to 45 minutes
+      remainingTime = 10;
       clearInterval(timer);
       updateTimeDisplay();
       localStorage.setItem('pomodoroTime', remainingTime);
@@ -176,4 +176,3 @@
   </script>
 </body>
 </html>
-
