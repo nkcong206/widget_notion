@@ -94,14 +94,14 @@
   </div>
   
   <script>
-    let remainingTime = 10; // 10 seconds in seconds
+    let remainingTime = 10; // 10 seconds
     let timer;
     let isRunning = false;
 
     function updateTimeDisplay() {
       const minutes = String(Math.floor(remainingTime / 60)).padStart(2, '0');
       const seconds = String(remainingTime % 60).padStart(2, '0');
-      document.getElementById('time').textContent = ${minutes}:${seconds};
+      document.getElementById('time').textContent = `${minutes}:${seconds}`;
     }
 
     function startTimer() {
@@ -134,7 +134,7 @@
 
     function resetTimer() {
       isRunning = false;
-      remainingTime = 10;
+      remainingTime = 10; // Reset to 10 seconds
       clearInterval(timer);
       updateTimeDisplay();
       localStorage.setItem('pomodoroTime', remainingTime);
@@ -176,3 +176,4 @@
   </script>
 </body>
 </html>
+
